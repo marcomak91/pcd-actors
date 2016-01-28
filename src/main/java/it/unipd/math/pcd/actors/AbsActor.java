@@ -46,6 +46,39 @@ package it.unipd.math.pcd.actors;
  */
 public abstract class AbsActor<T extends Message> implements Actor<T> {
 
+    protected MailBox<T> mailBox=new MailBox<>();
+
+    protected boolean isInterrupted=false;
+
+    protected Thread mailboxManager = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while (!isInterrupted) {
+                synchronized (mailBox) {
+                    while (mailBox.size() == 0) {
+                        try {
+                            mailBox.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    sender = mailBox.getSender();
+                    T msg = mailBox.getMessage();
+                    mailBox.remove();
+                    receive(msg);
+                }
+            }
+            synchronized (mailBox) {
+                while(mailBox.size() != 0){
+                    sender = mailBox.getSender();
+                    T msg = mailBox.getMessage();
+                    mailBox.remove();
+                    receive(msg);
+                }
+            }
+        }
+    });
+
     /**
      * Self-reference of the actor
      */
@@ -55,6 +88,10 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
      * Sender of the current message
      */
     protected ActorRef<T> sender;
+
+    public AbsActor() {
+        mailboxManager.start();
+    }
 
     /**
      * Sets the self-referece.
@@ -66,4 +103,20 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
         this.self = self;
         return this;
     }
+
+    protected void interrupt() {
+        isInterrupted=true;
+    }
+
+    protected final void reciveMail(T message, ActorRef<T> sender) {
+        synchronized(mailBox) {
+            if (!isInterrupted) {
+                Mail<T> m=new Mail<>(message, sender);
+                mailBox.add(m);
+                mailBox.notifyAll();
+            }
+        }
+    }
+
+
 }

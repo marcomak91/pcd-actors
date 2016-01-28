@@ -3,18 +3,23 @@ package it.unipd.math.pcd.actors;
 /**
  * Created by mprelaz on 27/01/16.
  */
-public class ImplActorRef implements ActorRef {
+public class ImplActorRef<T extends Message> implements ActorRef<T> {
 
-    private final static ImplActorSystem ias = ImplActorSystem.getInstance();
+    private ImplActorSystem actorSystem;
+
+    public ImplActorRef(ImplActorSystem actorSystem) {
+        this.actorSystem=actorSystem;
+    }
 
     @Override
     public void send(Message message, ActorRef to) {
-        Actor a = ias.get(to);
-        a.receive(message);
+        AbsActor a = (AbsActor) actorSystem.getActor(to);
+        a.reciveMail(message, this);
     }
 
     @Override
-    public int compareTo(Object o) {
-        return 0;
+    public int compareTo(ActorRef ar) {
+        return ( this == ar ) ? 0 : -1;
     }
+
 }

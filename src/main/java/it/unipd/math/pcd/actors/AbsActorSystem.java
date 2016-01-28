@@ -42,6 +42,7 @@ import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * A map-based implementation of the actor system.
  *
@@ -54,10 +55,20 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    private Map<ActorRef<?>, Actor<?>> actors;
+    private final Map<ActorRef<?>, Actor<?>> actors= new HashMap<>();
 
-    protected AbsActorSystem(){
-        actors=new HashMap<ActorRef<?>, Actor<?>>();
+    protected Map<ActorRef<? extends Message>,Actor<? extends Message>> getMap() {
+        return actors;
+    }
+
+    public Actor getActor(ActorRef<? extends Message> ar) {
+        Actor a = actors.get(ar);
+        if (a != null ) {
+            return a;
+        }
+        else {
+            throw new NoSuchActorException();
+        }
     }
 
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode) {
@@ -85,19 +96,4 @@ public abstract class AbsActorSystem implements ActorSystem {
 
     protected abstract ActorRef createActorReference(ActorMode mode);
 
-    @Override
-    public void stop(ActorRef<?> actor) {
-        actors.remove(actor);
-    }
-
-    @Override
-    public void stop() {
-        for (int i = 0; i < actors.size(); i++) {
-            actors.remove(i);
-        }
-    }
-
-    public Actor get(ActorRef ar){
-        return actors.get(ar);
-    }
 }

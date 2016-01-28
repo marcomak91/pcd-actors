@@ -1,30 +1,39 @@
 package it.unipd.math.pcd.actors;
 
+import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
+
 /**
  * Created by mprelaz on 27/01/16.
  */
-public class ImplActorSystem extends AbsActorSystem {
+public final class ImplActorSystem extends AbsActorSystem {
 
-    private static ImplActorSystem ias;
-
-    private ImplActorSystem(){
-        super();
+    @Override
+    public void stop(ActorRef<?> actor) {
+        if (this.getMap().containsKey(actor)) {
+            AbsActor a=(AbsActor) getActor(actor);
+            a.interrupt();
+            this.getMap().remove(actor);
+        }
+        else {
+            throw new NoSuchActorException();
+        }
     }
 
-    public static ImplActorSystem getInstance(){
-        if(ias==null){
-            ias = new ImplActorSystem();
+    @Override
+    public void stop() {
+        for (ActorRef<?> actor : this.getMap().keySet()) {
+            this.stop(actor);
         }
-        return ias;
+
     }
 
     @Override
     protected ActorRef createActorReference(ActorMode mode) {
         if(mode.equals(ActorMode.LOCAL)) {
-            return new ImplActorRef();
+            return new ImplActorRef(this);
         }
-        else{
-            return new ImplActorRef(); //da modificare
+        else {
+            throw new IllegalArgumentException();
         }
     }
 

@@ -46,11 +46,11 @@ package it.unipd.math.pcd.actors;
  */
 public abstract class AbsActor<T extends Message> implements Actor<T> {
 
-    protected MailBox<T> mailBox=new MailBox<>();
+    private final MailBox<T> mailBox;
 
-    protected boolean isInterrupted=false;
+    private boolean isInterrupted;
 
-    protected Thread mailboxManager = new Thread(new Runnable() {
+    private Thread mailboxManager= new Thread(new Runnable() {
         @Override
         public void run() {
             while (!isInterrupted) {
@@ -69,7 +69,7 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
                 }
             }
             synchronized (mailBox) {
-                while(mailBox.size() != 0){
+                while(mailBox.size() > 0) {
                     sender = mailBox.getSender();
                     T msg = mailBox.getMessage();
                     mailBox.remove();
@@ -90,6 +90,8 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
     protected ActorRef<T> sender;
 
     public AbsActor() {
+        mailBox=new MailBox<>();
+        isInterrupted=false;
         mailboxManager.start();
     }
 
@@ -104,11 +106,11 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
         return this;
     }
 
-    protected void interrupt() {
+    public void interrupt() {
         isInterrupted=true;
     }
 
-    protected final void reciveMail(T message, ActorRef<T> sender) {
+    public final void reciveMail(T message, ActorRef<T> sender) {
         synchronized(mailBox) {
             if (!isInterrupted) {
                 Mail<T> m=new Mail<>(message, sender);
@@ -117,6 +119,5 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
             }
         }
     }
-
 
 }

@@ -2,10 +2,8 @@ package it.unipd.math.pcd.actors;
 
 import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
 
-/**
- * Created by mprelaz on 27/01/16.
- */
-public final class ImplActorSystem extends AbsActorSystem {
+
+public class ImplActorSystem extends AbsActorSystem {
 
     @Override
     public void stop(ActorRef<?> actor) {
@@ -24,7 +22,6 @@ public final class ImplActorSystem extends AbsActorSystem {
         for (ActorRef<?> actor : this.getMap().keySet()) {
             this.stop(actor);
         }
-
     }
 
     @Override

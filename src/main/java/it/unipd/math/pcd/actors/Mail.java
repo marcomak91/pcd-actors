@@ -1,8 +1,6 @@
 package it.unipd.math.pcd.actors;
 
-/**
- * Created by mprelaz on 28/01/16.
- */
+
 public final class Mail<T extends Message> {
 
     private final T message;

@@ -2,9 +2,7 @@ package it.unipd.math.pcd.actors;
 
 import java.util.LinkedList;
 
-/**
- * Created by mprelaz on 28/01/16.
- */
+
 public final class MailBox<T extends Message> {
 
     private LinkedList<Mail<T>> mailbox=new LinkedList<>();

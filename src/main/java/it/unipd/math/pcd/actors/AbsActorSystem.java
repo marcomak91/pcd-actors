@@ -57,7 +57,7 @@ public abstract class AbsActorSystem implements ActorSystem {
      */
     private final Map<ActorRef<?>, Actor<?>> actors= new HashMap<>();
 
-    protected Map<ActorRef<? extends Message>,Actor<? extends Message>> getMap() {
+    public Map<ActorRef<? extends Message>,Actor<? extends Message>> getMap() {
         return actors;
     }
 
